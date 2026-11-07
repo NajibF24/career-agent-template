@@ -1,0 +1,48 @@
+# What the agent looks for. Edit freely; the scorer reads this file.
+candidate_name: Your Full Name
+location: Jakarta, Indonesia   # your city
+work_authorization: Indonesian citizen; no visa sponsorship needed for Indonesia
+
+target_titles:
+  - DevOps Engineer
+  - DevSecOps Engineer
+  - Platform Engineer
+  - Site Reliability Engineer
+  - Cloud Security Engineer
+  - Cloud Engineer
+  - Infrastructure Engineer
+  - Kubernetes Engineer
+  - Database Reliability Engineer
+
+seniority: [mid, senior]        # junior roles are scored down, lead/principal are fine
+
+# Geography rule (hard filter): keep a job only if it is
+#   - located in Indonesia, OR
+#   - remote/WFH and open to candidates based in Indonesia / APAC / worldwide.
+# Jobs located abroad with no remote option are dropped before scoring.
+countries_allowed: [Indonesia]
+remote_regions_allowed: [Indonesia, Southeast Asia, APAC, Asia, Worldwide, Global, Anywhere]
+
+# Priority (soft): remote/WFH/hybrid first, then Jakarta on-site.
+priority_order: [remote, wfh, hybrid, jakarta_onsite, other_indonesia_onsite]
+
+min_salary_idr_month: 15000000   # ignore if the posting has no salary
+languages: [English, Indonesian]
+output_language: English         # language of generated CV / cover letter / email
+
+must_not:
+  - requires relocation outside Indonesia
+  - unpaid or internship
+  - pure network/telecom field technician roles
+
+nice_to_have_keywords:
+  - Terraform
+  - ArgoCD
+  - GitOps
+  - Kubernetes
+  - OpenBao
+  - Vault
+  - SIEM
+  - PostgreSQL
+  - AWS
+  - DevSecOps

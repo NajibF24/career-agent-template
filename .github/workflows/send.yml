@@ -1,0 +1,42 @@
+name: send application
+
+on:
+  workflow_dispatch:
+    inputs:
+      job_id:
+        description: job id (from /top)
+        required: true
+      to:
+        description: recruiter email address
+        required: true
+
+permissions:
+  contents: write
+
+concurrency: send-${{ inputs.job_id }}
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: node src/send.js "${{ inputs.job_id }}" "${{ inputs.to }}"
+        env:
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      - name: commit status
+        run: |
+          git config user.name "career-agent"
+          git config user.email "career-agent@users.noreply.github.com"
+          git add data applications
+          git diff --cached --quiet || git commit -m "sent application ${{ inputs.job_id }}"
+          git pull --rebase -q origin main && git push

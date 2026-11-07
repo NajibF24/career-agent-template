@@ -1,0 +1,17 @@
+name = "career-bot"
+main = "worker/index.js"
+compatibility_date = "2026-10-01"
+
+[vars]
+GITHUB_REPO = "YOUR_GITHUB_USERNAME/career"
+REPO_URL = "https://github.com/YOUR_GITHUB_USERNAME/career"
+OPENAI_MODEL = "gpt-4.1-mini"
+
+[[rules]]
+type = "Text"
+globs = ["**/*.html"]
+fallthrough = true
+
+# Secrets (set with `npx wrangler secret put <NAME>`):
+#   TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, OPENAI_API_KEY, GITHUB_TOKEN (contents:read on this repo),
+#   WEBHOOK_SECRET (any random string), DASH_KEY (any random string; dashboard URL is https://<worker>/?k=<DASH_KEY>)

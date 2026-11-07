@@ -1,0 +1,26 @@
+{
+  "name": "career-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Personal job-search agent: scan Indonesian/remote DevOps jobs, score against CV, draft applications, notify via Telegram. Never submits anything.",
+  "scripts": {
+    "scan": "node src/run.js scan",
+    "score": "node src/run.js score",
+    "draft": "node src/run.js draft",
+    "notify": "node src/run.js notify",
+    "daily": "node src/run.js all",
+    "bot": "node --env-file-if-exists=.env src/bot.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "imapflow": "^1.0.191",
+    "mailparser": "^3.7.3",
+    "nodemailer": "^7.0.13",
+    "openai": "^5.12.2",
+    "playwright": "^1.65.0",
+    "yaml": "^2.8.1"
+  }
+}

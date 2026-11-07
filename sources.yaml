@@ -1,0 +1,51 @@
+# Job sources. Endpoints verified 2026-11-05. Set `enabled: false` to pause one.
+# Scope rule (Indonesia or remote-open-to-Indonesia) is applied later by the scorer, not here.
+sources:
+  # ---- aggregators --------------------------------------------------------
+  - name: Jobstreet Indonesia (Jakarta)
+    provider: jobstreet
+    keywords: [devops, devsecops, "site reliability", "platform engineer", "cloud engineer", "infrastructure engineer", kubernetes]
+    where: Jakarta
+    pages: 2
+  - name: Jobstreet Indonesia (remote / WFH)
+    provider: jobstreet
+    keywords: ["devops remote", "devops wfh", "devops work from home", "sre remote", "cloud engineer remote"]
+    where: ""
+    pages: 1
+  - name: Kalibrr (Jakarta)
+    provider: kalibrr
+    keywords: [devops, devsecops, "site reliability", "platform engineer", "cloud engineer", kubernetes]
+    location: Jakarta
+  - name: Kalibrr (Indonesia)
+    provider: kalibrr
+    keywords: [devops, "cloud engineer", "sre"]
+    location: Indonesia
+  - name: Glints
+    provider: glints
+    enabled: false          # glints.com blocks non-browser clients (firewall page); needs headless browser — v2
+
+  # ---- LinkedIn job alerts via Gmail (needs GMAIL_USER / GMAIL_APP_PASSWORD) ----
+  - name: LinkedIn job alerts (Gmail)
+    provider: linkedin-mail
+    days: 14
+    fetch_description: true
+
+  # ---- company boards -----------------------------------------------------
+  - { name: Vidio,                 provider: vidio }
+  - { name: GoTo (Gojek/Tokopedia), provider: lever,          slug: GoToGroup,    company: GoTo Group }
+  - { name: Xendit,                provider: greenhouse,     slug: xendit,       company: Xendit }
+  - { name: DKatalis (Bank Jago),  provider: greenhouse,     slug: dkatalislabs, company: DKatalis / Bank Jago }
+  - { name: Bank Jago,             provider: greenhouse,     slug: jago,         company: Bank Jago }
+  - { name: Grab Indonesia,        provider: smartrecruiters, slug: Grab,        company: Grab, country: id }
+  - { name: Alodokter,             provider: smartrecruiters, slug: alodokter,   company: Alodokter }
+  - { name: Amartha,               provider: workable,       slug: amartha,      company: Amartha }
+  - { name: tiket.com,             provider: workday,        tenant: tiketdotcom, wd: wd3, site: Tiket_Careers, company: tiket.com }
+  - { name: Kredivo (FinAccel),    provider: manatal,        slug: finaccel,     company: Kredivo / FinAccel }
+  - { name: Bukalapak,             provider: manatal,        slug: bukalapak,    company: Bukalapak }
+  - { name: Blibli,                provider: blibli }
+  - { name: Ruangguru,             provider: ruangguru }
+  - { name: Kitabisa,              provider: kalibrr,        company_code: kitabisa-com }
+
+  # Not machine-readable today (need headless browser): Traveloka, Shopee ID, Flip, Stockbit/Bibit (Glints),
+  # Sirclo (Dealls), Evermos. Mekari (Trakstar) exists but lists no openings. Halodoc/Pintu/DANA/OVO/eFishery:
+  # no public board found.

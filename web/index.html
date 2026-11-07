@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Job Radar</title>
+<style>
+  :root { --bg:#0b0f17; --card:#121826; --line:#1f2937; --text:#e5e7eb; --muted:#9ca3af; --accent:#22d3ee; --green:#22c55e; --yellow:#eab308; }
+  * { box-sizing:border-box }
+  body { margin:0; background:var(--bg); color:var(--text); font:15px/1.5 system-ui, -apple-system, Segoe UI, Roboto, sans-serif }
+  header { position:sticky; top:0; background:rgba(11,15,23,.92); backdrop-filter:blur(8px); border-bottom:1px solid var(--line); padding:12px 16px; display:flex; gap:10px; flex-wrap:wrap; align-items:center }
+  header h1 { font-size:18px; margin:0 12px 0 0; letter-spacing:.3px }
+  header h1 span { color:var(--accent) }
+  input, select { background:var(--card); color:var(--text); border:1px solid var(--line); border-radius:8px; padding:7px 10px; font:inherit }
+  input[type=search] { min-width:200px }
+  label.chk { display:flex; align-items:center; gap:6px; color:var(--muted); font-size:14px; cursor:pointer }
+  .stats { color:var(--muted); font-size:13px; margin-left:auto }
+  main { max-width:1100px; margin:0 auto; padding:16px; display:grid; gap:12px }
+  .job { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px; display:grid; grid-template-columns:1fr auto; gap:6px 16px }
+  .job h2 { margin:0; font-size:16px }
+  .job h2 a { color:var(--text); text-decoration:none }
+  .job h2 a:hover { color:var(--accent) }
+  .meta { color:var(--muted); font-size:13px }
+  .tags { display:flex; gap:6px; flex-wrap:wrap; margin-top:4px }
+  .tag { font-size:12px; padding:2px 8px; border-radius:999px; border:1px solid var(--line); color:var(--muted) }
+  .tag.remote { border-color:var(--accent); color:var(--accent) }
+  .tag.draft { border-color:var(--green); color:var(--green) }
+  .fit { font-size:22px; font-weight:700; text-align:right; align-self:start }
+  .fit.g { color:var(--green) } .fit.y { color:var(--yellow) } .fit.w { color:var(--muted) }
+  .why { grid-column:1 / -1; font-size:13px; color:var(--muted); display:none; margin-top:6px; border-top:1px solid var(--line); padding-top:8px }
+  .job.open .why { display:block }
+  .why b { color:var(--text) }
+  .empty { color:var(--muted); text-align:center; padding:40px }
+  @media (max-width:600px){ .job{grid-template-columns:1fr} .fit{text-align:left} }
+</style>
+</head>
+<body>
+<header>
+  <h1>Job <span>Radar</span></h1>
+  <input type="search" id="q" placeholder="cari judul / perusahaan…">
+  <select id="sort"><option value="priority">Urut: prioritas</option><option value="newest">Urut: terbaru</option><option value="fit">Urut: skor</option></select>
+  <select id="minfit"><option value="0">Semua skor</option><option value="3.5">≥ 3.5</option><option value="4" selected>≥ 4</option><option value="4.5">≥ 4.5</option></select>
+  <select id="age"><option value="999">Semua umur</option><option value="2">≤ 2 hari</option><option value="7">≤ 7 hari</option><option value="14">≤ 14 hari</option></select>
+  <label class="chk"><input type="checkbox" id="remote"> remote / WFH saja</label>
+  <label class="chk"><input type="checkbox" id="drafted"> ada draf</label>
+  <span class="stats" id="stats"></span>
+</header>
+<main id="list"></main>
+<script>
+let jobs = [];
+const $ = (id) => document.getElementById(id);
+const days = (d) => d ? Math.max(0, Math.round((Date.now() - new Date(d)) / 864e5)) : null;
+const esc = (s = "") => String(s).replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+function render() {
+  const q = $("q").value.toLowerCase(), minfit = +$("minfit").value, maxAge = +$("age").value;
+  let rows = jobs.filter((j) => j.fit >= minfit && (!$("remote").checked || ["remote", "wfh", "hybrid"].includes(j.mode)) && (!$("drafted").checked || j.draft)
+    && (q === "" || `${j.title} ${j.company} ${j.location}`.toLowerCase().includes(q)) && (days(j.posted_at) ?? 0) <= maxAge);
+  const s = $("sort").value;
+  rows.sort(s === "newest" ? (a, b) => new Date(b.posted_at || b.found_at) - new Date(a.posted_at || a.found_at) : s === "fit" ? (a, b) => b.fit - a.fit : (a, b) => b.priority - a.priority);
+  $("stats").textContent = `${rows.length} dari ${jobs.length} lowongan`;
+  $("list").innerHTML = rows.length ? rows.map((j) => {
+    const age = days(j.posted_at); const cls = j.fit >= 4.5 ? "g" : j.fit >= 4 ? "y" : "w";
+    return `<article class="job" onclick="this.classList.toggle('open')">
+      <div>
+        <h2><a href="${esc(j.url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${esc(j.title)}</a></h2>
+        <div class="meta">${esc(j.company)} · ${esc(j.location || j.country)}${age === null ? "" : ` · ${age} hari lalu`}${j.salary ? ` · ${esc(j.salary)}` : ""}</div>
+        <div class="tags">${["remote", "wfh", "hybrid"].includes(j.mode) ? `<span class="tag remote">${j.mode}</span>` : `<span class="tag">${esc(j.mode)}</span>`}<span class="tag">${esc(j.seniority)}</span><span class="tag">${esc(j.source)}</span>${j.draft ? `<a class="tag draft" href="${esc(j.draft)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">draf siap ✍️</a>` : ""}</div>
+      </div>
+      <div class="fit ${cls}">${j.fit.toFixed(1)}</div>
+      <div class="why"><b>Kenapa cocok:</b> ${j.reasons.map(esc).join(" · ") || "-"}<br><b>Gap:</b> ${j.missing.map(esc).join(" · ") || "-"}</div>
+    </article>`;
+  }).join("") : `<div class="empty">Tidak ada lowongan yang cocok dengan filter.</div>`;
+}
+fetch("/api/jobs" + location.search).then((r) => r.json()).then((d) => { jobs = d; render(); });
+["q", "sort", "minfit", "age", "remote", "drafted"].forEach((id) => $(id).addEventListener("input", render));
+</script>
+</body>
+</html>
