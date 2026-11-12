@@ -12,6 +12,7 @@ concurrency: daily-scan
 
 jobs:
   scan:
+    if: github.repository != 'NajibF24/career-agent-template'   # the template itself has no secrets and must not collect jobs
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -32,6 +33,7 @@ jobs:
         run: |
           git config user.name "career-agent"
           git config user.email "career-agent@users.noreply.github.com"
+          mkdir -p applications   # absent until the first draft is written
           git add data applications
           git diff --cached --quiet || git commit -m "scan $(date -u +%F)"
           git push
